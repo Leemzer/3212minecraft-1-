@@ -4,6 +4,7 @@ public class Movement : MonoBehaviour
 {
 
     public CharacterController character;
+    public Transform cameraObject;
     public Vector2 moveInput;
     public Vector2 lookInput;
     public Vector2 lookSense;
@@ -11,6 +12,14 @@ public class Movement : MonoBehaviour
     
     public float moveSpeed = 5f;
      
+    public float currentAngelX;
+
+    public float minAngelX;
+
+    public float maxAngelX;
+
+
+
 
     /************************/
     // Кастомні функції
@@ -33,6 +42,14 @@ public class Movement : MonoBehaviour
     {
         Vector3 look = new Vector3(0, lookInput.x, 0);
         character.transform.Rotate(look * Time.fixedDeltaTime * lookSense.x);
+
+        currentAngelX -= lookInput.y * Time.fixedDeltaTime * lookSense.y;
+        currentAngelX = Mathf.Clamp(currentAngelX,minAngelX,maxAngelX);
+
+        Vector3 cameraAngles = cameraObject.transform.eulerAngles;
+        cameraAngles.x = currentAngelX;
+        cameraObject.transform.eulerAngles = cameraAngles;
+
     }
 
 
@@ -42,7 +59,7 @@ public class Movement : MonoBehaviour
 
     void Start()
     {
-        
+        Cursor.lockState = CursorLockMode.Locked;
     }
 //sadadas
      //aaaaaaaa
@@ -52,7 +69,7 @@ public class Movement : MonoBehaviour
     }
     void FixedUpdate()
     {
-    
+
         Move_FixedUpdate();
         Look_FixedUpdate();
     }
