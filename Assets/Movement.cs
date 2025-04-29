@@ -1,77 +1,115 @@
 using UnityEngine;
 
+
 public class Movement : MonoBehaviour
 {
-
-    public CharacterController character;
-    public Transform cameraObject;
+    public CharacterController hitBox;
+    public Camera cameraObject;
     public Vector2 moveInput;
-    public Vector2 lookInput;
-    public Vector2 lookSense;
-    
-    
+    public Vector2 camInput;
+    public Vector2 camSense;
     public float moveSpeed = 5f;
-     
-    public float currentAngelX;
-
-    public float minAngelX;
-
-    public float maxAngelX;
+    public float rotationX;
 
 
+    public float velocityY;
+    public float g= -1f;
+    public float jumpForce = 1f;
+
+     public LayerMask groundLayer;
+    public bool isGrounded;
 
 
-    /************************/
-    // Кастомні функції
-    /**********************/
+
+    void Gravity_FixedUpdate()
+    {
+        if (isGrounded)
+        {
+            if(velocityY<-1) velocityY = -1f;
+           
+        }
+
+        velocityY += g * Time.fixedDeltaTime;
+        Vector3 move = new Vector3(0, velocityY, 0);
+        hitBox.Move(move * Time.fixedDeltaTime);
+    }
+
+
+    void IsGrounded_FixedUpdate()
+    {
+        float sphereRadius = 0.1f;
+        Vector3 spherePosition = hitBox.transform.position;
+        isGrounded = Physics.CheckSphere(spherePosition, sphereRadius, groundLayer);
+    }
+    void OnDrawGizmos()
+    {
+        if (hitBox != null)
+        {
+            Gizmos.color = Color.red;
+            float sphereRadius = 0.1f;
+            Vector3 spherePosition = hitBox.transform.position;
+            Gizmos.DrawWireSphere(spherePosition, sphereRadius);
+        }
+    }
+
+
     void ReadInput_Update()
     {
         moveInput.x = Input.GetAxis("Horizontal");
         moveInput.y = Input.GetAxis("Vertical");
-        lookInput.x = Input.GetAxis("Mouse X");
-        lookInput.y = Input.GetAxis("Mouse Y");
+        camInput.x = Input.GetAxis("Mouse X");
+        camInput.y = Input.GetAxis("Mouse Y");
+
+         if (Input.GetButtonDown("Jump") && isGrounded)
+            {
+                velocityY = jumpForce;
+            }
     }
     void Move_FixedUpdate()
     {
         Vector3 move = new Vector3(moveInput.x, 0, moveInput.y);
-        move = character.transform.TransformDirection(move);
-        character.Move(move * Time.fixedDeltaTime * moveSpeed);
+        move = hitBox.transform.TransformDirection(move);
+        hitBox.Move(move * Time.fixedDeltaTime * moveSpeed);
     }
-
-    void Look_FixedUpdate()
+    void Rotate_FixedUpdate()
     {
-        Vector3 look = new Vector3(0, lookInput.x, 0);
-        character.transform.Rotate(look * Time.fixedDeltaTime * lookSense.x);
-
-        currentAngelX -= lookInput.y * Time.fixedDeltaTime * lookSense.y;
-        currentAngelX = Mathf.Clamp(currentAngelX,minAngelX,maxAngelX);
-
-        Vector3 cameraAngles = cameraObject.transform.eulerAngles;
-        cameraAngles.x = currentAngelX;
-        cameraObject.transform.eulerAngles = cameraAngles;
-
+        Vector3 rotate = new Vector3(0, camInput.x, 0);
+        hitBox.transform.Rotate(rotate * Time.fixedDeltaTime * camSense.x);
     }
-
-
-    /************************/
-    // Вбудовані евенти
-    /**********************/
+    
+    void RotateCam_FixedUpdate()
+    {
+        rotationX -= camInput.y * camSense.y* Time.fixedDeltaTime;
+        rotationX = Mathf.Clamp(rotationX, -90f, 90f);
+        Vector3 rotate = new Vector3(rotationX, 0, 0);
+        cameraObject.transform.localEulerAngles = rotate;
+    }
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        print("Mouse Locked by Movement");
     }
-//sadadas
-     //aaaaaaaa
+
+    
     void Update()
     {
+    
         ReadInput_Update();
+       
     }
+
     void FixedUpdate()
     {
-
-        Move_FixedUpdate();
-        Look_FixedUpdate();
+      IsGrounded_FixedUpdate();
+      Gravity_FixedUpdate();
+      Move_FixedUpdate();
+      Rotate_FixedUpdate();
+      RotateCam_FixedUpdate();
+    
     }
+
+
+
 }
  
