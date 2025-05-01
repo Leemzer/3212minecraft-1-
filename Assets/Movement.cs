@@ -34,7 +34,7 @@ public class Movement : MonoBehaviour
         Vector3 move = new Vector3(0, velocityY, 0);
         hitBox.Move(move * Time.fixedDeltaTime);
     }
-
+//dasda
 
     void IsGrounded_FixedUpdate()
     {
