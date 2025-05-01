@@ -92,7 +92,6 @@ public class Movement : MonoBehaviour
         print("Mouse Locked by Movement");
     }
 
-    
     void Update()
     {
     
@@ -107,6 +106,7 @@ public class Movement : MonoBehaviour
       Move_FixedUpdate();
       Rotate_FixedUpdate();
       RotateCam_FixedUpdate();
+      
     
     }
 
